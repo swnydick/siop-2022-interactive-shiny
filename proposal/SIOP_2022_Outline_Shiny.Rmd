@@ -1,0 +1,23 @@
+---
+title: "SIOP Outline"
+author: "Steven W. Nydick"
+date: "1/14/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is simply a scratch document to be to plan for the Shiny presentation. We will probably want to cover the following topics. Note that these topics are based on the original proposal. All of these themes should be based around the dataset and research question provided (and relating to I/O psychology). We should also include an introduction that compares Shiny to other systems for Executive Reports as well as a conclusion that covers some of the misconceptions of using Shiny.
+
+1. Hello World Application. What's the minimum needed to get an application to run? How does the UI link to the server? What object are available in the UI and the server?
+2. Shiny Inputs. What are some basic text inputs that are available? How are these inputs accessed in the server? How are these inputs modified in the server?
+3. Shiny Outputs. What are some basic plot and table outputs that are available? How do we link the inputs with the outputs so that these plots and tables are updated?
+4. Customized UI. What can we do to customize the UI, either using CSS or HTML? How can we link CSS documents so that the UI is pretty? What packages exist (such as `shinydashboard` and `bs4Dash`) to make generating pretty UI easy and straightforward.
+5. Manipulating UI. How do we manipulate the UI when we want to do something special? How do we hide or disable certain buttons? How do we change the UI given inputs and outputs so that certain things are displayed? This will involve the `shinyjs` package as well as `renderUI` output objects.
+6. Reactivity. What are some weird things that can happen with reactivity (such as infinite loops, or things not updating as expected)? What if we have a table that updates an input, which in turn updates the table? How do we view these issues and debug them (using `reactlog` or `browser` statements)?
+7. Extensions. How can we create our own UI elements or use Javascript libraries? This should be a brief discussion, but we would put a document together with some ideas of what to do.
+8. Reusability. Once you have a set of files that constitutes an application, how do we turn this into an R package? This will discuss some ideas of how to quickly get an `R` package as well as pointers to opinionated systems (such as `golem`) as well as `shinyModules` for similar benefits without completely generating a package.
+
+In the above enumeration, Steps 1-5 will generate parts of a final application (where each part builds on the proceeding part). Step 6 will be a simplified version of 5 with some issues added in for debugging purposes. Step 7 will be a separate conversation. Step 8 will take the output of Step 5, build Shiny Modules off of it, and turn it into a package that can be installed (or at least go through the first few steps of turning it into a package).
