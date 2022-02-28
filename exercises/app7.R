@@ -1,14 +1,10 @@
-# Step 7 talking point to be determined
+# Step 7 Hide the 'more reporting' with shinyjs
 # 
-# TODO: perhaps to make an optional "colourblind palette picker" panel and 
-# TODO: make the the n_col_buffer variable reactive?
-# TODO: use this to introduce an action button?
-# TODO: or use this to talk about extensions?
+# Now let's suppose you want to give users the choice to hide or show the
+# reporting section
 #
-# The R library colorspace is also used in the ggplot to 
-# improve UI the experience for colorblindness
-# 
-
+# This can be done using javascript via shinyjs().
+#
 
 # data pre-processing ----
 
@@ -19,7 +15,7 @@
 data <- read.csv(file.path("..","data", "garments_worker_productivity.csv"))
 
 data$date <- as.character(as.Date(data$date, tryFormats = c("%m/%d/%Y", "%m/%d/%y")))
-data$team <- paste0("team_", ifelse(data$team < 10, paste0(0, data$team), data$team))
+data$team <- paste0("Team", ifelse(data$team < 10, paste0(0, data$team), data$team))
 data$day <- factor(data$day, levels = c("Saturday",
                                         "Sunday",
                                         "Monday",
@@ -28,41 +24,45 @@ data$day <- factor(data$day, levels = c("Saturday",
                                         "Thursday",
                                         "Friday"))
 
+# remove white spaces from  department names
+data$department <- trimws(data$department)
+# replace wrong spelling
+data$department[data$department %in% 'sweing'] <- 'sewing'
+
 # create lists to feed the control widgets
-department_list <- sapply(sort(unique(trimws(data$department))), list)
+department_list <- sapply(sort(unique(data$department)), list)
 team_list <- sapply(sort(unique(data$team)), list)
+
+# set starting selection for department and team
+dept_starting_selection <- department_list[[2]]
+team_starting_selection <- c(team_list[[1]], team_list[[2]])
+
+# text labels for action button for showing/hiding reporting
+reporting_button_text <- c("Hide Reporting", "Show Reporting")
 
 # functions ----
 ## function to plot incentive vs actual_productivity scatter plot
-makeplot2 <- function(dat, dept){
+makeplot2 <- function(dat, dept, trendline){
   
-  ## Managing colorspace::scale_color_discrete_sequential colours:
-  # as the discrete_sequential colour palette's
-  # lightest colour can be perceived as 'too light'
-  # as is the case where in the current dataset when
-  # all 12 teams are plotted, 
-  # let's create the ability to add additional 'lightest' colours which we 
-  # then do not use to 'buffer' the lightest colour
+  trendline_txt <- ifelse(trendline, 
+                          "Trendline drawn", 
+                          "")
   
-  n_col_buffer <- 1 # additional 'lightest colour'
-  unique_colours <- length(unique(dat$team)) + n_col_buffer
-  
-  ggplot(dat, aes(x = incentive, 
-                  y = actual_productivity,
-                  color = team)
-  ) + 
-    # geom_point replaced by translucent jittered points for better visibility
-    # geom_jitter(alpha = 0.7) + 
-    geom_point(alpha = 0.7) +
-    # color scheme used for vision diversity support
-    scale_color_discrete_sequential(palette = "batlow", 
-                                    nmax = unique_colours, 
-                                    order = (1 + n_col_buffer):unique_colours
-    ) + 
+  g <- ggplot(dat, aes(x = incentive, 
+                       y = actual_productivity,
+                       color = team)) + 
+    geom_point(alpha = 0.7) + 
     theme_bw() + 
     labs(title = paste("Department:", dept), 
-         # caption = "Points are jittered slightly and made translucent for better visibility",
-         subtitle = "Incentive vs Actual Productivity") 
+         caption = trendline_txt,
+         subtitle = "Incentive vs Actual Productivity")
+  
+  if (trendline) {
+    g <- g + geom_smooth(formula = y ~ x, method = lm, alpha = 0.15)
+  }
+  
+  g
+  
 }
 
 ## function to return reactive data subset based on the department and team(s) selected
@@ -79,13 +79,15 @@ makeplotdata <- function(dat, dept, tm = NULL){
 # R Shiny app ----
 
 library(shiny)
+library(shinyjs)
 library(ggplot2)
-library(colorspace)
 
 ui <- fluidPage(
   
+  useShinyjs(),
+  
   # Dashboard Title
-  titlePanel("App 7: ?"),
+  titlePanel("App 7: Adding Javascript components"),
   
   sidebarLayout(
     sidebarPanel(
@@ -95,11 +97,27 @@ ui <- fluidPage(
       
       radioButtons("radio", label = h5("Department"),
                    choices = department_list, 
-                   selected = "sweing"),
+                   selected = dept_starting_selection),
       
-      checkboxGroupInput("checkGroup", label = h5("Teams"), 
-                         choices = team_list,
-                         selected = NULL),
+      # multiple team selection enabled!
+      selectInput("select", label = h5("Teams"), 
+                  choices = team_list,
+                  multiple = TRUE,
+                  selected = team_starting_selection),
+      
+      h4("Additional controls:"),
+      
+      # TRUE/FALSE control for plotting regression line in plot
+      checkboxInput("checkbox", label = "Plot regression line for each team?",
+                    value = FALSE),
+      
+      # Button to show or hide reporting section
+      ## the class attribute provides some colour via Bootstrap
+      ## see https://getbootstrap.com/docs/4.0/components/buttons/
+      ## See also the related observeEvent(input$button, ...)
+      ## for the change in text and colour when this button is clicked
+      actionButton("button", label = reporting_button_text[1], 
+                   class = "btn-warning"),
       
       hr(),
       
@@ -116,9 +134,11 @@ ui <- fluidPage(
     
     mainPanel(
       
-      # render reporting outputs
-      textOutput("actual_productivity_statement"),
-      tableOutput("actual_productivity_week"),
+      # set the reporting section as its own div section and call it 'Reporting'
+      div(id = 'Reporting',
+          textOutput("actual_productivity_statement"),
+          tableOutput("actual_productivity_week"),
+      ),
       
       # render plot output
       plotOutput("plot", click = "plot_click"),
@@ -135,30 +155,38 @@ server <- function(input, output) {
   
   ## reactive outputs ----
   dept_selected <- reactive(input$radio)
-  team_selected <- reactive(input$checkGroup)
+  team_selected <- reactive(input$select)
+  trendline <- reactive(input$checkbox)
+  reporting_button_state <- reactive(input$button)
   
   plot_data <- reactive(
     makeplotdata(data, dept_selected(), team_selected())
   )
   
   ## plot output ----
-  output$plot <- renderPlot(
-    makeplot2(plot_data(), dept_selected()), 
+  output$plot <- renderPlot( 
+    makeplot2(plot_data(), dept_selected(), trendline()),
     res = 96
   )
   
-  # table output to show points near user click as a table
-  # note: because there are now more than 1 line in the render* function, 
-  # the curly brackets are now needed
   output$data_at_clickpoint <- renderTable({
     req(input$plot_click)
     nearPoints(plot_data(), input$plot_click)
   })
   
   ## actual_productivity reporting outputs ----
+  
+  observeEvent(reporting_button_state(), {
+    toggle(id = "Reporting", anim = TRUE) # hide or show
+    toggleClass("button", "btn-danger") # toggled button colour
+    # recall that input$button starts with value 0 increments by 1 everytime you click on it.
+    # use even/odd state to toggle between the two states of hide/show
+    html("button", ifelse((reporting_button_state() %% 2) == 0 , 
+                          reporting_button_text[1] , 
+                          reporting_button_text[2]))
+  }) 
+  
   output$actual_productivity_statement <- renderText({
-    # technically we can stick the team_txt into the paste0itself,
-    # but that would make the statement harder to read!
     team_txt <- ifelse(is.null(team_selected()), 
                        "all teams have ",
                        paste(

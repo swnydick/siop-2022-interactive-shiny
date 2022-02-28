@@ -23,7 +23,7 @@
 data <- read.csv(file.path("..","data", "garments_worker_productivity.csv"))
 
 data$date <- as.Date(data$date, tryFormats = c("%m/%d/%Y", "%m/%d/%y"))
-data$team <- paste0("team_", ifelse(data$team < 10, paste0(0, data$team), data$team))
+data$team <- paste0("Team", ifelse(data$team < 10, paste0(0, data$team), data$team))
 data$day <- factor(data$day, levels = c("Saturday",
                                         "Sunday",
                                         "Monday",
@@ -32,9 +32,18 @@ data$day <- factor(data$day, levels = c("Saturday",
                                         "Thursday",
                                         "Friday"))
 
+# # remove white spaces from  department names
+data$department <- trimws(data$department)
+# replace wrong spelling
+data$department[data$department %in% 'sweing'] <- 'sewing'
+
 # create lists to feed the control widgets
-department_list <- sapply(sort(unique(trimws(data$department))), list)
+department_list <- sapply(sort(unique(data$department)), list)
 team_list <- sapply(sort(unique(data$team)), list)
+
+# set starting selection for department and team
+dept_starting_selection <- department_list[[2]]
+team_starting_selection <- c(team_list[[1]], team_list[[2]])
 
 # functions ----
 ## function to plot incentive vs actual_productivity scatter plot
@@ -77,11 +86,13 @@ ui <- fluidPage(
       
       radioButtons("radio", label = h5("Department"),
                    choices = department_list, 
-                   selected = "sweing"),
+                   selected = dept_starting_selection),
       
-      checkboxGroupInput("checkGroup", label = h5("Teams"), 
-                         choices = team_list,
-                         selected = NULL),
+      # multiple team selection enabled!
+      selectInput("select", label = h5("Teams"), 
+                  choices = team_list,
+                  multiple = TRUE,
+                  selected = team_starting_selection),
       
       hr(),
       
@@ -99,7 +110,7 @@ ui <- fluidPage(
     mainPanel(
       
       # render interaction outputs
-      "Change the selections in the side panel and watch the outputs react!",
+      "Make selections in the side panel and watch the outputs react!",
       verbatimTextOutput("department_value"),
       verbatimTextOutput("team_value"),
       
@@ -117,11 +128,11 @@ server <- function(input, output) {
   # Notice here that we're calling input$radio twice: 
   # here and in the renderPlot function: not efficient!
   output$department_value <- renderPrint(input$radio)
-  output$team_value <- renderPrint(input$checkGroup)
+  output$team_value <- renderPrint(input$select)
   
   ## plot output ----
   output$plot <- renderPlot(
-    makeplot1(data, input$radio, input$checkGroup),
+    makeplot1(data, input$radio, input$select),
     res = 96
   )
   

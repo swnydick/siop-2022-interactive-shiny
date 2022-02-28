@@ -1,31 +1,6 @@
-# Step 6 Click on a point! Add more reporting!
-# 
-# [A] let's add a new interactive mode to allow users to 
-# click on points that they are interested in and show data 
-# near the point of clicking.
-# 
-# To do this, let's modify the plotting function to split it into two functions: 
-# one for plotting, and 
-# a second to return a reactive dataset
-# since we will be re-using this reactive dataset in the table output
+# Step 8 prettify using thematic
 #
-# As example, compare the table outputs when you click on 
-# (department = sweing) incentive = 113
-# between no teams are selected (notice that teams using incentive 113 = teams 1,2,3,10)
-# while after you select on teams 1 and 2, 
-# the table output subsets itself appropriately.
-#
-# Notice data$date has been coerced from Date to as.character as Shiny doesn't
-# seem to like display as.Date as a character....
-#
-# 
-# [B] Let's also swap the initial department and team selection with something
-# more 'reporting-like': a sentence describing the average actual productivity,
-# and a table showing the average actual productivity by day of week.
-#
-# [C]: let's also add the ability to toggle a regression line  
-#
-# Continue to talk about reactivity and reuse....
+# More HTML stuff!
 
 # data pre-processing ----
 
@@ -58,6 +33,8 @@ team_list <- sapply(sort(unique(data$team)), list)
 dept_starting_selection <- department_list[[2]]
 team_starting_selection <- c(team_list[[1]], team_list[[2]])
 
+# text labels for action button for showing/hiding reporting
+reporting_button_text <- c("Hide Reporting", "Show Reporting")
 
 # functions ----
 ## function to plot incentive vs actual_productivity scatter plot
@@ -71,7 +48,7 @@ makeplot2 <- function(dat, dept, trendline){
                        y = actual_productivity,
                        color = team)) + 
     geom_point(alpha = 0.7) + 
-    theme_bw() + 
+    # theme_bw() + ## moving this theme setting into the global space
     labs(title = paste("Department:", dept), 
          caption = trendline_txt,
          subtitle = "Incentive vs Actual Productivity")
@@ -98,12 +75,33 @@ makeplotdata <- function(dat, dept, tm = NULL){
 # R Shiny app ----
 
 library(shiny)
+library(shinyjs)
 library(ggplot2)
+
+## libraries for customising your own themes
+library(thematic)
+library(bslib)
+# customise pretty colours for the ggplots bit: you can use R colours here
+# note the default discrete scale okabe_ito() has only 8 colours: 
+# anything more than that defaults to ggplot2
+
+thematic_shiny(bg = "gray10", fg = 'slategray3')
+theme_set(theme_bw()) ## setting the ggplot theme here globally instead of within the plotting function previously
 
 ui <- fluidPage(
   
+  useShinyjs(),
+  
+  # customise pretty colours for the html bits: note that you have to use HTML colours
+  theme = bs_theme(bg = "#345678",
+                   fg = "white",
+                   primary = "tomato", # the link is picking up the primary colour
+                   warning = "gold", # bootstrap colour applied to the show/hide reporting button
+                   danger = "lightcyan",
+                   base_font = font_google("Redressed")),
+  
   # Dashboard Title
-  titlePanel("App 6: Reactivity part 2"),
+  titlePanel("App 8: Prettify"),
   
   sidebarLayout(
     sidebarPanel(
@@ -127,6 +125,10 @@ ui <- fluidPage(
       checkboxInput("checkbox", label = "Plot regression line for each team?",
                     value = FALSE),
       
+      # Button to show or hide reporting section
+      actionButton("button", label = reporting_button_text[1], 
+                   class = "btn-warning"),
+      
       hr(),
       
       # Descriptions for the data
@@ -142,9 +144,11 @@ ui <- fluidPage(
     
     mainPanel(
       
-      # render reporting outputs
-      textOutput("actual_productivity_statement"),
-      tableOutput("actual_productivity_week"),
+      # set the reporting section as its own div section and call it 'reporting'
+      div(id = 'Reporting',
+          textOutput("actual_productivity_statement"),
+          tableOutput("actual_productivity_week"),
+      ),
       
       # render plot output
       plotOutput("plot", click = "plot_click"),
@@ -163,8 +167,8 @@ server <- function(input, output) {
   dept_selected <- reactive(input$radio)
   team_selected <- reactive(input$select)
   trendline <- reactive(input$checkbox)
+  reporting_button_state <- reactive(input$button)
   
-  # a new reactive variable to hold sub-setted data
   plot_data <- reactive(
     makeplotdata(data, dept_selected(), team_selected())
   )
@@ -175,18 +179,23 @@ server <- function(input, output) {
     res = 96
   )
   
-  # table output to show points near user click as a table
-  # note: because there are now more than 1 line in the render* function, 
-  # the curly brackets are now needed
   output$data_at_clickpoint <- renderTable({
     req(input$plot_click)
     nearPoints(plot_data(), input$plot_click)
   })
   
   ## actual_productivity reporting outputs ----
+  
+  ## toggles reporting section based on button input
+  observeEvent(reporting_button_state(), {
+    toggle(id = "Reporting", anim = TRUE) 
+    toggleClass("button", "btn-danger") 
+    html("button", ifelse((reporting_button_state() %% 2) == 0 , 
+                          reporting_button_text[1] , 
+                          reporting_button_text[2]))
+  }) 
+  
   output$actual_productivity_statement <- renderText({
-    # technically we can stick the team_txt into the paste0itself,
-    # but that would make the statement harder to read!
     team_txt <- ifelse(is.null(team_selected()), 
                        "all teams have ",
                        paste(
@@ -214,7 +223,12 @@ server <- function(input, output) {
     return(act_prod_wk)
   })
   
+  
+  
 }
+
+## mustn't turn this off otherwise ggplot won't pick up the desired colour schemes
+# thematic_off()
 
 # Run the application 
 shinyApp(ui = ui, server = server)

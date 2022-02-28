@@ -15,7 +15,8 @@
 # let's prefix the integers with a 0 if the integer is less than 10
 # and then prefix the numbers with a 'team_',
 # (c) trim unwanted white-space using trimws() from the department column. 
-# (d) order the weekdays logically
+# (d) Fix the spelling of the department 'sewing' from 'sweing' ...
+# (e) order the weekdays logically
 #
 # Let's include on the user interface the ability 
 # to toggle between the 2 departments and select teams at will.
@@ -23,7 +24,7 @@
 # To do so let's create some control widgets for the user to play with.
 # In ui(),
 # (a) create radio buttons selectors for department (1 selection only)
-# (b) create checkbox group for team (can select multiple; note the default chosen is NULL)
+# (b) create checkbox group for team (can select multiple; note the default chosen is Team01 and Team10)
 #
 # In server(), create the necessary output items to 'collect' user selections
 # for display back into ui()'s mainPanel.
@@ -47,7 +48,7 @@
 data <- read.csv(file.path("..","data", "garments_worker_productivity.csv"))
 
 data$date <- as.Date(data$date, tryFormats = c("%m/%d/%Y", "%m/%d/%y"))
-data$team <- paste0("team_", ifelse(data$team < 10, paste0(0, data$team), data$team))
+data$team <- paste0("Team", ifelse(data$team < 10, paste0(0, data$team), data$team))
 data$day <- factor(data$day, levels = c("Saturday",
                                         "Sunday",
                                         "Monday",
@@ -56,9 +57,18 @@ data$day <- factor(data$day, levels = c("Saturday",
                                         "Thursday",
                                         "Friday"))
 
+# remove white spaces from  department names
+data$department <- trimws(data$department)
+# replace wrong spelling
+data$department[data$department %in% 'sweing'] <- 'sewing'
+
 # create lists to feed the control widgets
-department_list <- sapply(sort(unique(trimws(data$department))), list)
+department_list <- sapply(sort(unique(data$department)), list)
 team_list <- sapply(sort(unique(data$team)), list)
+
+# set starting selection for department and team
+dept_starting_selection <- department_list[[2]]
+team_starting_selection <- c(team_list[[1]], team_list[[2]])
 
 # R Shiny app ----
 
@@ -77,11 +87,13 @@ ui <- fluidPage(
       
       radioButtons("radio", label = h5("Department"),
                    choices = department_list, 
-                   selected = "sweing"),
+                   selected = dept_starting_selection),
       
-      checkboxGroupInput("checkGroup", label = h5("Teams"), 
-                         choices = team_list,
-                         selected = NULL),
+      # multiple team selection enabled!
+      selectInput("select", label = h5("Teams"), 
+                   choices = team_list,
+                   multiple = TRUE,
+                   selected = team_starting_selection),
       
       hr(),
       
@@ -99,9 +111,9 @@ ui <- fluidPage(
     mainPanel(
       
       # render interaction outputs
-      "Change the selections in the side panel and watch the outputs react!",
+      "Make selections in the side panel and watch the outputs react!",
       verbatimTextOutput("department_value"),
-      verbatimTextOutput("team_value"),
+      verbatimTextOutput("team_value")
       
     )
   )
@@ -112,7 +124,7 @@ server <- function(input, output) {
   
   # collect the user's input, and return it to the ui()
   output$department_value <- renderPrint(input$radio)
-  output$team_value <- renderPrint(input$checkGroup)
+  output$team_value <- renderPrint(input$select)
   
 }
 
