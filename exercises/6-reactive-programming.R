@@ -52,7 +52,7 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 
 # SOLUTION
-# 1. create an observeEvent with one set to TRUE
+# 1. create an observeEvent with once set to TRUE
 # 2. run the code through the observeEvent
 
 # note: if something reactive, evalulate ONLY in reactive.
