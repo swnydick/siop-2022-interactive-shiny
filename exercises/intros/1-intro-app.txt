@@ -1,0 +1,5 @@
+<h3><span style="color: #006550;"><strong>App 1: Hello World </strong></span></h3>
+<p><span style="color: #000000;">This app creates a page that displays the text "Hello World", using two different types of basic visual layouts.&nbsp; This app will also cover the most basic required functions within shiny.</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;">fluidPage, titlePanel, sidebarLayout, sidebarPanel, mainPanel, shinyApp</span></p>
+<p></p>
+<p></p>

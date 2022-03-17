@@ -1,0 +1,8 @@
+<h3><span style="color: #006550;"><strong>App 4:&nbsp; Our First Plot!</strong></span></h3>
+<p><span style="color: #000000;">In App 4 we'll introduce a plot that reacts to the user selection from app three (departments and teams).&nbsp; The plot will only show 1 department at a time, and the points will be colored according to team.&nbsp; You'll be introduced to a render and output function that will work together to display the plot.&nbsp;</span></p>
+<p><span style="color: #000000;">Below is a list of the new code introduced :</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;"><strong>ui</strong> : plotOutput</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;"><strong>server</strong>: renderPlot</span></p>
+<p><span style="color: #000000;">At the end of this tutorial, you will understand how to create a plot function that can react to ui selections.&nbsp; Something you'll notice is that we'll end up calling the same input twice (once to print and once to plot).&nbsp; The next app will cover reactivity and demonstrate how to make this operation more efficient.&nbsp;&nbsp;</span><span style="color: #494849;"></span></p>
+<p></p>
+<p></p>

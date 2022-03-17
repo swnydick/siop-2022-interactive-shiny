@@ -2,81 +2,9 @@
 #
 # More HTML stuff!
 
-# data pre-processing ----
-
-## use this when loading directly from within R for checking etc.
-# data <- read.csv(file.path("data", "garments_worker_productivity.csv"))
-
-## use this for 'Run App'.
-data <- read.csv(file.path("..","data", "garments_worker_productivity.csv"))
-
-data$date <- as.character(as.Date(data$date, tryFormats = c("%m/%d/%Y", "%m/%d/%y")))
-data$team <- paste0("Team", ifelse(data$team < 10, paste0(0, data$team), data$team))
-data$day <- factor(data$day, levels = c("Saturday",
-                                        "Sunday",
-                                        "Monday",
-                                        "Tuesday",
-                                        "Wednesday",
-                                        "Thursday",
-                                        "Friday"))
-
-# remove white spaces from  department names
-data$department <- trimws(data$department)
-# replace wrong spelling
-data$department[data$department %in% 'sweing'] <- 'sewing'
-
-# create lists to feed the control widgets
-department_list <- sapply(sort(unique(data$department)), list)
-team_list <- sapply(sort(unique(data$team)), list)
-
-# set starting selection for department and team
-dept_starting_selection <- department_list[[2]]
-team_starting_selection <- c(team_list[[1]], team_list[[2]])
-
-# text labels for action button for showing/hiding reporting
-reporting_button_text <- c("Hide Reporting", "Show Reporting")
-
-# functions ----
-## function to plot incentive vs actual_productivity scatter plot
-makeplot2 <- function(dat, dept, trendline){
-  
-  trendline_txt <- ifelse(trendline, 
-                          "Trendline drawn", 
-                          "")
-  
-  g <- ggplot(dat, aes(x = incentive, 
-                       y = actual_productivity,
-                       color = team)) + 
-    geom_point(alpha = 0.7) + 
-    # theme_bw() + ## moving this theme setting into the global space
-    labs(title = paste("Department:", dept), 
-         caption = trendline_txt,
-         subtitle = "Incentive vs Actual Productivity")
-  
-  if (trendline) {
-    g <- g + geom_smooth(formula = y ~ x, method = lm, alpha = 0.15)
-  }
-  
-  g
-  
-}
-
-## function to return reactive data subset based on the department and team(s) selected
-makeplotdata <- function(dat, dept, tm = NULL){
-  
-  dd <- dat[dat$department %in% dept, ]
-  if (!is.null(tm)) {
-    dd <- dd[dd$team %in% tm, ]
-  }
-  
-  return(dd)
-}
-
-# R Shiny app ----
-
-library(shiny)
-library(shinyjs)
-library(ggplot2)
+##############
+# SETTING UP #
+##############
 
 ## libraries for customising your own themes
 library(thematic)
@@ -93,11 +21,11 @@ ui <- fluidPage(
   useShinyjs(),
   
   # customise pretty colours for the html bits: note that you have to use HTML colours
-  theme = bs_theme(bg = "#345678",
-                   fg = "white",
-                   primary = "tomato", # the link is picking up the primary colour
-                   warning = "gold", # bootstrap colour applied to the show/hide reporting button
-                   danger = "lightcyan",
+  theme = bs_theme(bg        = "#345678",
+                   fg        = "white",
+                   primary   = "tomato", # the link is picking up the primary colour
+                   warning   = "gold", # bootstrap colour applied to the show/hide reporting button
+                   danger    = "lightcyan",
                    base_font = font_google("Redressed")),
   
   # Dashboard Title
@@ -169,15 +97,16 @@ server <- function(input, output) {
   trendline <- reactive(input$checkbox)
   reporting_button_state <- reactive(input$button)
   
-  plot_data <- reactive(
-    makeplotdata(data, dept_selected(), team_selected())
-  )
+  plot_data <- reactive(x = data_team_subset(data = data, 
+                                             dept = dept_selected(), 
+                                             team = team_selected())) # End plot data
   
-  ## plot output ----
-  output$plot <- renderPlot( 
-    makeplot2(plot_data(), dept_selected(), trendline()),
-    res = 96
-  )
+  # PLOT # 
+  output$plot <- renderPlot(expr = incentive_plot(data    = plot_data(), 
+                                                  dept    = dept_selected(), 
+                                                  team    = team_selected(), 
+                                                  show_lm = trendline()),
+                            res = 96)
   
   output$data_at_clickpoint <- renderTable({
     req(input$plot_click)
