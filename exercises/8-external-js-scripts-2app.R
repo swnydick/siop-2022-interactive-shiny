@@ -45,7 +45,7 @@ ui <- fluidPage(
                    base_font = font_google("Redressed")),
   
   # TITLE #
-  titlePanel("App 9: Integration JS"),
+  titlePanel("App 8: Integration JS"),
   
   # SIDEBAR #
   sidebarLayout(
