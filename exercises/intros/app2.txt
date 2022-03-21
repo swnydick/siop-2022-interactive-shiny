@@ -1,5 +1,0 @@
-<h3><span style="color: #006550;"><strong>App 2: Introducing static text</strong></span></h3>
-<p><span style="color: #000000;">In App 2, we'll add some text to parts of the layout from App 1, and also introduce you to the dataset that we'll use for the rest of the tutorial.&nbsp; Shiny apps generate webpages, so understanding how html tags can work within shiny is important for customizations.&nbsp; </span></p>
-<p><span style="color: #000000;">In this app, we'll introduce you to a few of the tools within the R package, htmltools. These tools create R objects that represent HTML tags.&nbsp;</span></p>
-<p style="padding-left: 40px;"><span style="color: #494849;">p(), hr(), h4(), a()</span></p>
-<p></p>

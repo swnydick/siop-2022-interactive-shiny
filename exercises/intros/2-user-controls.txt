@@ -1,5 +1,5 @@
 <h3><span style="color: #006550;"><strong>App 2:&nbsp; User Controls&nbsp;</strong></span></h3>
-<p><span style="color: #000000;">In App 3 we'll introduce a simple use-case for how to add user-controls, by introducing the ability to toggle between departments and to select teams.&nbsp; Specifically, radio buttons will be used to create selections by department and a check box will be created to choose the team(s).&nbsp;</span></p>
+<p><span style="color: #000000;">In App 2 we'll introduce a simple use-case for how to add user-controls, by introducing the ability to toggle between departments and to select teams.&nbsp; Specifically, radio buttons will be used to create selections by department and a check box will be created to choose the team(s).&nbsp;</span></p>
 <p><span style="color: #000000;">Below is a list of the new code introduced :</span></p>
 <p style="padding-left: 40px;"><span style="color: #494849;"><strong>ui</strong> : radioButtons, selectInput, verbatimTextOutput</span></p>
 <p style="padding-left: 40px;"><span style="color: #494849;"><strong>server</strong>: renderPrint</span></p>

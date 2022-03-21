@@ -5,23 +5,36 @@
 # 2022-04-29                            #
 #########################################
 
-#############################
-# INTRODUCTIONS TO TUTORIAL #
-#############################
+##############
+# SETTING UP #
+##############
 
-# INTRO # 
-source('R/intro_displayr.R')
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
+function_dir   <- file.path(project_dir, "exercises", "R")
+data_dir       <- file.path(project_dir, "data")
+
+# set the path to excercises
+setwd(analyses_dir)
+
+#########
+# INTRO #
+#########
+source(file.path(function_dir, 'intro_displayr.R'), 
+       local = FALSE)
 intro_displayr()
 
-####################
-# NEW GLOBAL ITEMS #
-####################
+###########################
+# NEW GLOBAL ITEMS : DATA #
+###########################
 
 # DATA #
 # Note that RStudio will run the app.R in its own working directory - so it's 
 # necessary in this case to navigate 'up' to the data folder.
 # For info on how the data was cleaned, see the clean_data.R file in the data folder
-data <- readRDS('../data/garments_worker_productivity_cleaned.rds')
+data <- readRDS(file.path(data_dir, 'garments_worker_productivity_cleaned.rds'))
 
 # Explain Data Here
 # View(head(data))
@@ -38,7 +51,7 @@ team_starting_selection <- team_list[1:2]
 # After this app - we will load this information in a setting up file
 # within each app. 
 # This is what can be loaded right before each app.
-# source('0-global.R')
+source('0-global.R')
 
 ######
 # UI #

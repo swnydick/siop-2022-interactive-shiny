@@ -1,0 +1,5 @@
+<h3><span style="color: #006550;"><strong>App 6: Adding Javascipt Components</strong></span></h3>
+<p>From the documentation :&nbsp;</p>
+<p style="padding-left: 40px;"><span style="color: #494849;">shinyjs lets you perform common JavaScript operations that enhance the user experience in applications without having to know any JavaScript. Examples include: hiding an element, disabling an input, resetting an input back to its original value, delaying code execution by a few seconds, and many more useful functions.&nbsp;<code>shinyjs</code>&nbsp;also includes a colour picker widget, a colour picker RStudio addin, and can also be used to easily run your own custom JavaScript functions from R.</span></p>
+<p>In App 6, we'll use shinyjs to add a reporting button that will hide the reporting sentences and table.&nbsp;</p>
+<p style="padding-left: 40px;">&nbsp;</p>

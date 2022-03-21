@@ -1,0 +1,4 @@
+<h3><span style="color: #006550;"><strong>App 5 : Additional Features and Reactivity con't&nbsp;</strong></span></h3>
+<p><span style="color: #000000;">App 5 will add several new features.&nbsp; For one, we'll add a new interactive mode to allow users to click on points that they are interested in and show data near the point of clicking.&nbsp; We'll also introduce a function to display a table in shiny. Lastly, we'll add the ability to see a linear trendline in the graph.</span></p>
+<p><span style="color: #000000;">In order to do this, we'll need to make the dataset reactive so that we can point to it more easily. Then, we will introduce the function that will enable us to click near a point to see its data. Below are the new functions introduced :&nbsp;</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;">renderTable( ) , nearPoints( ) , checkboxInput( )&nbsp;</span></p>

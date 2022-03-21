@@ -1,0 +1,4 @@
+<h3><span style="color: #006550;"><strong>App 7: Customization of Themes</strong></span></h3>
+<p>In App 7, we'll introduce you to 2 new libraries for customizing the appearance of your ui.&nbsp; These packages are the following :</p>
+<p style="padding-left: 40px;">thematic :&nbsp;</p>
+<p style="padding-left: 40px;">&nbsp;</p>

@@ -1,5 +1,5 @@
-<h3><span style="color: #006550;"><strong>App 4:&nbsp; Our First Plot!</strong></span></h3>
-<p><span style="color: #000000;">In App 4 we'll introduce a plot that reacts to the user selection from app three (departments and teams).&nbsp; The plot will only show 1 department at a time, and the points will be colored according to team.&nbsp; You'll be introduced to a render and output function that will work together to display the plot.&nbsp;</span></p>
+<h3><span style="color: #006550;"><strong>App 3:&nbsp; Plot Introduction</strong></span></h3>
+<p><span style="color: #000000;">In App 3 we'll introduce a plot that reacts to the user selection from app three (departments and teams).&nbsp; The plot will only show 1 department at a time, and the points will be colored according to team.&nbsp; You'll be introduced to a render and output function that will work together to display the plot.&nbsp;</span></p>
 <p><span style="color: #000000;">Below is a list of the new code introduced :</span></p>
 <p style="padding-left: 40px;"><span style="color: #494849;"><strong>ui</strong> : plotOutput</span></p>
 <p style="padding-left: 40px;"><span style="color: #494849;"><strong>server</strong>: renderPlot</span></p>

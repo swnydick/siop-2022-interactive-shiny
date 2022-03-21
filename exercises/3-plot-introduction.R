@@ -1,18 +1,34 @@
+#########################################
+# Plot Introduction                     #
+#                                       #
+# Korn Ferry Institute: Automation Team #
+# 2022-04-29                            #
+#########################################
+
 ##############
 # SETTING UP #
 ##############
 
-# NEW ITEMS INTO GLOBAL ENVIRONMENT : PLOTTING FUNCTIONS and LIBRARY # 
-library(ggplot2)
-source("../R/incentive_plot.R",
-       local = TRUE)
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
 
-##################################
-# INTRO RUN BEFORE UI AND SERVER #
-##################################
+# set the path to excercises
+setwd(analyses_dir)
 
-# INTRO # 
-intro_displayr('app4')
+# To clean things up - running what's needed for all apps
+source('0-global.R')
+
+# Note - need some new items - but these are sourced in global 
+# library(ggplot2)
+# library(dplyr)
+
+#########
+# INTRO #
+#########
+
+intro_displayr()
 
 ######
 # UI #
@@ -22,7 +38,7 @@ intro_displayr('app4')
 ui <- fluidPage(
   
   # TITLE #
-  titlePanel("App 4: Our First Plot!"),
+  titlePanel("App 3: Plotting Introduction"),
   
   # SIDEBAR #
   sidebarLayout(
@@ -61,13 +77,13 @@ ui <- fluidPage(
       
       # OUTPUT FROM SELECTIONS #
       "Make selections in the side panel and watch the outputs react!",
-      verbatimTextOutput("department_value"),
-      verbatimTextOutput("team_value"),
+      verbatimTextOutput(outputId = "department_value"),
+      verbatimTextOutput(outputId = "team_value"),
       
       ## PLOT OUTPUT ##
       # This takes the plotting instructions from the server 
       # plot is the outputId
-      plotOutput("plot")
+      plotOutput(outputId = "plot")
       
     ) # End mainPanel
   ) # End sideBarLayout
@@ -80,20 +96,19 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   ## PRINTING SELECTIONS ## 
-  # Notice here that we're calling input$radio twice: 
-  # here and in the renderPlot function: not efficient!
-  # We'll learn how to make this more efficient in the next app
-  output$department_value <- renderPrint(x = input$radio)
-  output$team_value       <- renderPrint(x = input$select)
+  output$department_value <- renderPrint(expr = input$radio)
+  output$team_value       <- renderPrint(expr = input$select)
   
   ## STORE THE PLOT OUTPUT ## 
   # This tells the ui that a plot should be displayed (and prepares it)
-  # TODO can add this to front 
-  output$plot <- renderPlot(
-    incentive_plot(data = data, 
-                   dept = input$radio, 
-                   team = input$select),
-    res = 96
+  output$plot <- renderPlot(expr = data_team_subset(data = data, 
+                                                    dept = input$radio, 
+                                                    team = input$select) %>%
+                              incentive_plot(data = ., 
+                                             dept = input$radio, 
+                                             team = input$select, 
+                                             trendline = FALSE),
+                            res = 96
   ) # End renderPlot
   
 } # End server

@@ -5,15 +5,26 @@
 # 2022-04-29                            #
 #########################################
 
+##############
+# SETTING UP #
+##############
+
+# Run what's needed for all files 
+
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
+function_dir   <- file.path(project_dir, "exercises", "R")
+
+# set the path to excercises
+setwd(analyses_dir)
+
 #########
 # INTRO #
 #########
-
-# Shiny apps are run in the root directory 
-print(getwd())
-
-# Displays what we'll learn in this tutorial
-source('R/intro_displayr.R')
+source(file.path(function_dir, 'intro_displayr.R'), 
+       local = FALSE)
 intro_displayr()
 
 ######

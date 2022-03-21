@@ -1,6 +1,6 @@
-# Libraries 
-require(htmltools)
-require(tools)
+library(tools)
+library(htmltools)
+
 
 # Function to extract the name of the file - where intro and file names match
 extract_appname <- 
@@ -9,6 +9,7 @@ extract_appname <-
   }
 
 # Function to read in and report html text in the viewer
+# Assumes you are in the exercises directory - the app location
 intro_displayr <- 
   function(apppath       = NULL, 
            file_location = 'intros'){

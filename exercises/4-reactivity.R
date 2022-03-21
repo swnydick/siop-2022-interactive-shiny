@@ -1,9 +1,30 @@
+#########################################
+# Plot Introduction                     #
+#                                       #
+# Korn Ferry Institute: Automation Team #
+# 2022-04-29                            #
+#########################################
+
 ##############
 # SETTING UP #
 ##############
 
-# INTRO # 
-intro_displayr('app5')
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
+
+# set the path to excercises
+setwd(analyses_dir)
+
+# To clean things up - running what's needed for all apps
+source('0-global.R')
+
+#########
+# INTRO #
+#########
+
+intro_displayr()
 
 ######
 # UI #
@@ -13,7 +34,7 @@ intro_displayr('app5')
 ui <- fluidPage(
   
   # TITLE #
-  titlePanel("App 5: Introduction to Reactivity"),
+  titlePanel("App 4: Introduction to Reactivity"),
   
   # SIDEBAR #
   sidebarLayout(
@@ -83,9 +104,16 @@ server <- function(input, output) {
   output$department_value <- renderPrint(dept_selected())
   output$team_value       <- renderPrint(team_selected())
   
-  ## RENDER PLOT ##
+  ## REACTIVE DATA ## 
+  # Here, we make the data reactive - so that we can better call if to other 
+  # functions later. 
+  plot_data <- reactive(x = data_team_subset(data = data, 
+                                             dept = dept_selected(), 
+                                             team = team_selected())) 
+  
+  # RENDER PLOT #
   output$plot <- renderPlot(
-    incentive_plot(data = data, 
+    incentive_plot(data = plot_data(), 
                    dept = dept_selected(), 
                    team = team_selected()), 
     res = 96

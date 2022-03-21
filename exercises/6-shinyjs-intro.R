@@ -1,10 +1,10 @@
-# Step 7 Hide the 'more reporting' with shinyjs
-# 
-# Now let's suppose you want to give users the choice to hide or show the
-# reporting section
-#
-# This can be done using javascript via shinyjs().
-#
+#########################################
+# Adding Javascript Components          #
+#                                       #
+# Korn Ferry Institute: Automation Team #
+# 2022-04-29                            #
+#########################################
+
 
 ##############
 # SETTING UP #
@@ -15,6 +15,9 @@ library(shinyjs)
 
 # text labels for action button for showing/hiding reporting
 reporting_button_text <- c("Hide Reporting", "Show Reporting")
+
+# INTRO # 
+intro_displayr()
 
 ######
 # UI #
@@ -28,7 +31,7 @@ ui <- fluidPage(
   useShinyjs(),
   
   # TITLE # 
-  titlePanel("App 7: Adding Javascript components"),
+  titlePanel("App 6: Adding Javascript components"),
   
   # SIDEBAR #
   sidebarLayout(
@@ -54,11 +57,11 @@ ui <- fluidPage(
                     label   = "Plot regression line for each team?",
                     value   = FALSE),
       
-      # ACTION BUTTON #
-      ## the class attribute provides some colour via Bootstrap
-      ## see https://getbootstrap.com/docs/4.0/components/buttons/
-      ## See also the related observeEvent(input$button, ...)
-      ## for the change in text and colour when this button is clicked
+      ## ACTION BUTTON TO SHOW/HIDE REPORTING ##
+      # the class attribute provides some color via Bootstrap
+      # see https://getbootstrap.com/docs/4.0/components/buttons/
+      # See also the related observeEvent(input$button, ...)
+      # for the change in text and colour when this button is clicked
       actionButton(inputId = "button", 
                    label   = reporting_button_text[1], 
                    class   = "btn-warning"),
@@ -75,12 +78,12 @@ ui <- fluidPage(
               Please visit the link for source and data dictionary."
       ) # End paragraph
       
-    ), # sidebarPanel
+    ), # end sidebarpanel
     
     # MAIN # 
     mainPanel(
       
-      # REPORTING BUTTON # 
+      ## REPORTING BUTTON ## 
       # set the reporting section as its own div section and call it 'Reporting'
       # div produces a tag name for the button
       div(
@@ -96,45 +99,56 @@ ui <- fluidPage(
       "Click somewhere on the plot to see data near it.",
       tableOutput("data_at_clickpoint")
       
-    )
-  )
-)
+    ) # end mainPanel
+  ) # end sidebarLayout
+) # end ui
 
+##########
+# SERVER #
+##########
 
 server <- function(input, output) {
   
-  # REACTIVE OUTPUTS #
+  ## REACTIVE OUTPUTS ##
   # Note the addition of the reporting button - provided as a state
   dept_selected <- reactive(x = input$radio)
   team_selected <- reactive(x = input$select)
   trendline     <- reactive(x = input$checkbox)
   reporting_button_state <- reactive(input$button)
   
+  # MAKE PLOT DATA # 
   plot_data <- reactive(x = data_team_subset(data = data, 
                                              dept = dept_selected(), 
                                              team = team_selected())) # End plot data
   
   # PLOT # 
-  output$plot <- renderPlot(expr = incentive_plot(data    = plot_data(), 
-                                                  dept    = dept_selected(), 
-                                                  team    = team_selected(), 
-                                                  show_lm = trendline()),
+  output$plot <- renderPlot(expr = incentive_plot(data      = plot_data(), 
+                                                  dept      = dept_selected(), 
+                                                  team      = team_selected(), 
+                                                  trendline = trendline()),
                             res = 96)
   
-  # POINT - CLICK : FUNCTIONALITY # 
-  output$data_at_clickpoint <- renderTable({
-    
+  ## ADDING PLOT FUNCTIONALITY : nearPoints ## 
+  click_point_data <- reactiveVal(NULL)
+  
+  observeEvent(input$plot_click, {
     req(input$plot_click)
-    nearPoints(df        = plot_data(), 
-               coordinfo = input$plot_click)
+    click_point_data(nearPoints(df        = plot_data(), 
+                                coordinfo = input$plot_click))
+  })
+  
+  output$data_at_clickpoint <- renderTable({
+    click_point_data()
   })
   
   ## REPORTING STATE ## 
   # observeEvent in this case is triggered with the reporting button state changes
   # it then either shows or hides the reporting options 
   observeEvent(reporting_button_state(), {
+    
     toggle(id = "Reporting", anim = TRUE) # hide or show
     toggleClass("button", "btn-danger") # toggled button colour
+    
     # recall that input$button starts with value 0 increments by 1 everytime you click on it.
     # use even/odd state to toggle between the two states of hide/show
     html("button", ifelse((reporting_button_state() %% 2) == 0 , 
@@ -153,15 +167,16 @@ server <- function(input, output) {
                          ifelse(length(team_selected()) < 2, "has ", "have ")
                        )
     ) 
-    return(
-      paste0(
+    
+    # This combines the team and department text
+    paste0(
         dept_selected(),
         "'s ",
         team_txt,
         "an average actual_productivity of ",
         round(mean(plot_data()$actual_productivity),2)
       )
-    )
+    
   }) # End productivity statement generation
   
   # PRODUCTIVITY TABLE # 
@@ -171,8 +186,7 @@ server <- function(input, output) {
     act_prod_wk <- aggregate.data.frame(plot_data()$actual_productivity, 
                                         by = list(plot_data()$day), 
                                         mean)
-    colnames(act_prod_wk) <- c("day", "average actual productivity")
-    return(act_prod_wk)
+    setNames(object = act_prod_wk, nm = c('day', 'average actual productivity'))
   })
   
 }
