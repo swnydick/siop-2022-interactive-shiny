@@ -9,9 +9,26 @@
 # SETTING UP #
 ##############
 
-## libraries for customising your own themes
-library(thematic)
-library(bslib)
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
+
+# set the path to excercises
+setwd(analyses_dir)
+
+# To clean things up - running what's needed for all apps
+source('0-global.R')
+
+#########
+# INTRO #
+#########
+
+intro_displayr()
+
+## New libraries for customising your own themes
+# library(thematic)
+# library(bslib)
 # customise pretty colours for the ggplots bit: you can use R colours here
 # note the default discrete scale okabe_ito() has only 8 colours: 
 # anything more than that defaults to ggplot2
@@ -19,9 +36,6 @@ library(bslib)
 thematic_shiny(bg = "gray10", 
                fg = 'slategray3')
 theme_set(theme_bw()) ## setting the ggplot theme here globally instead of within the plotting function previously
-
-# INTRO # 
-intro_displayr()
 
 ######
 # UI #
