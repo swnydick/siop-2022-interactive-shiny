@@ -5,92 +5,38 @@
 # 2022-04-29                            #
 #########################################
 
-# 1. Read/Clean Data ===========================================================
-require(dplyr)
-require(stringr)
-require(ggplot2)
+##############
+# SETTING UP #
+##############
 
-# read data and fix columns
-data <- read.csv(file.path("..", "data", "garments_worker_productivity.csv")) 
-data <- mutate(
-  .data = data,
-  date       = as.Date(x          = date,
-                       tryFormats = c("%m/%d/%Y", "%m/%d/%y")) |>
-               as.character(),
-  team       = str_pad(string = team,
-                       width  = 2,
-                       side   = "left") %>%
-               paste0("Team", .),
-  day        = factor(x   = day,
-                      levels = c("Saturday", "Sunday",
-                                 "Monday", "Tuesday",
-                                 "Wednesday", "Thursday", "Friday")),
-  department = str_trim(department) %>%
-               ifelse(. %in% "sweing", "sewing", .)
-  
-  
-)
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
 
-# create lists to feed the control widgets
-department_list <- setNames(nm = sort(unique(data$department)))
-team_list       <- setNames(nm = sort(unique(data$team)))
+# set the path to exercises
+setwd(analyses_dir)
 
-# set starting selection for department and team
-dept_starting_selection <- department_list[2]
-team_starting_selection <- team_list[1:2]
+# To clean things up - running what's needed for all apps
+source('0-global.R')
 
-# text labels for action button for showing/hiding reporting
-reporting_button_text   <- c("Hide Reporting", "Show Reporting")
+#########
+# INTRO #
+#########
 
-# 2. Functions =================================================================
+# intro_displayr()
 
-makeplot2 <- function(dat, dept, trendline){
-  
-  trendline_txt <- c("", "Trendline drawn")[trendline + 1]
-  
-  g <- ggplot(data    = dat,
-              mapping = aes(x     = incentive, 
-                            y     = actual_productivity,
-                            color = team)) + 
-      geom_point(alpha = 0.7) + 
-      labs(title    = paste("Department:", dept), 
-           caption  = trendline_txt,
-           subtitle = "Incentive vs Actual Productivity")
-  
-  if (trendline) {
-    g <- g + geom_smooth(formula = y ~ x, method = lm, alpha = 0.15)
-  }
-  
-  g
-}
-
-makeplotdata <- function(dat, dept, tm = NULL){
-  
-  dd <- dat[dat$department %in% dept, ]
-  
-  if (!is.null(tm)) {
-    dd <- dd[dd$team %in% tm, ]
-  }
-  
-  return(dd)
-}
-
-# 3. Application ===============================================================
-
-library(shiny)
-library(shinyjs)
-library(ggplot2)
-library(thematic)
-library(bslib)
-
+# 1. Application ===============================================================
 thematic_shiny(bg = "gray10",
                fg = 'slategray3')
 theme_set(theme_bw())
 
 ui <- fluidPage(
   
+  # NECESSARY CALL TO USE SHINYJS # 
   useShinyjs(),
   
+  # CREATE A BOTTSTRAP THEME #
   theme = bs_theme(bg        = "#345678",
                    fg        = "white",
                    primary   = "tomato",
@@ -98,35 +44,48 @@ ui <- fluidPage(
                    danger    = "lightcyan",
                    base_font = font_google("Redressed")),
   
+  # TITLE #
   titlePanel("App 9: Integration JS"),
   
+  # SIDEBAR #
   sidebarLayout(
     sidebarPanel(
+      
+      # RADIO BUTTON FOR DEPARTMENT SELECTION #
       h4("Select these:"),
       radioButtons(inputId  = "radio",
                    label    = h5("Department"),
                    choices  = department_list, 
                    selected = dept_starting_selection),
+      
+      # SELECTING TEAM BY A LIST # 
       selectInput(inputId  = "select",
                   label    = h5("Teams"), 
                   choices  = team_list,
                   multiple = TRUE,
                   selected = team_starting_selection),
       
+      # TRENDLINE # 
       h4("Additional controls:"),
       checkboxInput(inputId = "checkbox",
                     label   = "Plot regression line for each team?",
                     value   = FALSE),
+      
+      # LADDA BUTTON #
       # add ladda button for plot refresh
       laddaButton(inputId = "refresh",
                   label   = "Refresh"),
       hr(),
+      
+      # ACTION BUTTON TO SHOW/HIDE REPORTING # 
       actionButton(inputId = "button",
                    label   = reporting_button_text[1], 
                    class   = "btn-warning"),
       
+      # BREAK #
       hr(),
       
+      # DATA SOURCE #
       h4("Source Data"),
       p("The ", 
         a("Productivity Prediction Garment Employees Dataset", 
@@ -137,13 +96,20 @@ ui <- fluidPage(
       
     ),
     
+    # MAIN #
     mainPanel(
+      
+      # REPORTING BUTTON #
       div(id = 'Reporting',
           textOutput("actual_productivity_statement"),
           tableOutput("actual_productivity_week"),
       ),
+      
+      # PLOT OUTPUTS #
       plotOutput(outputId = "plot",
                  click    = "plot_click"),
+      
+      # TABLE OUTPUTS #
       "Click somewhere on the plot to see data near it.",
       tableOutput("data_at_clickpoint")
       
@@ -157,6 +123,7 @@ server <- function(input, output) {
   # indicate ladda button for ID
   ladda                  <- Ladda("refresh")
   
+  # REACTIVE OUTPUTS #
   trendline              <- reactive(input$checkbox)
   reporting_button_state <- reactive(input$button)
   
@@ -165,6 +132,8 @@ server <- function(input, output) {
   team_selected          <- reactiveVal()
   plot_data              <- reactiveVal()
   plot_gg                <- reactiveVal()
+  
+  # MAKE PLOT DATA AND PLOT OBJECT #
   
   # update plot ONLY when refresh
   observeEvent(
@@ -192,12 +161,23 @@ server <- function(input, output) {
       team_selected(input$select)
     
       # update plot data and plot
-      plot_data(makeplotdata(data, dept_selected(), team_selected()))
-      plot_gg(makeplot2(plot_data(), dept_selected(), trendline()))
+      plot_data(
+        data_team_subset(data = data,
+                         dept = dept_selected(),
+                         team = team_selected())
+      )
+      plot_gg(
+        incentive_plot(data      = plot_data(),
+                       dept      = dept_selected(),
+                       team      = team_selected(),
+                       trendline = trendline())
+      )
     },
     ignoreNULL = FALSE,
     ignoreInit = FALSE
   )
+  
+  # PLOT #
   
   # make ONLY if we've updated the plot
   output$plot <- renderPlot(
@@ -211,11 +191,19 @@ server <- function(input, output) {
     res = 96
   )
   
-  output$data_at_clickpoint <- renderTable({
+  # CLICK-POINT FUNCTIONALITY # 
+  click_point_data <- reactiveVal(NULL)
+
+  observeEvent(input$plot_click, {
     req(input$plot_click)
-    nearPoints(plot_data(), input$plot_click)
+    click_point_data(nearPoints(plot_data(), input$plot_click))
   })
   
+  output$data_at_clickpoint <- renderTable({
+    click_point_data()
+  })
+  
+  # PRODUCTIVITY REPORTING OUTPUTS # 
   observeEvent(reporting_button_state(), {
     toggle(id   = "Reporting",
            anim = TRUE) 
@@ -223,6 +211,8 @@ server <- function(input, output) {
     html("button",
          reporting_button_text[((reporting_button_state() %% 2) == 0) + 1])
   }) 
+  
+  # GENERATE PRODUCTIVITY STATEMENT # 
   
   # make text ONLY if we've updated the text
   output$actual_productivity_statement <- renderText({
@@ -262,3 +252,10 @@ server <- function(input, output) {
 # Run the application 
 shinyApp(ui = ui, server = server)
 
+#######
+# RUN #
+#######
+
+# turn this off if you want to reset the theme.
+# thematic_off()
+shinyApp(ui = ui, server = server)

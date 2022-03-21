@@ -5,77 +5,28 @@
 # 2022-04-29                            #
 #########################################
 
-# 1. Read/Clean Data ===========================================================
-require(dplyr)
-require(stringr)
-require(ggplot2)
+##############
+# SETTING UP #
+##############
 
-# read data and fix columns
-data <- read.csv(file.path("..", "data", "garments_worker_productivity.csv")) 
-data <- mutate(
-  .data = data,
-  date       = as.Date(x          = date,
-                       tryFormats = c("%m/%d/%Y", "%m/%d/%y")) |>
-               as.character(),
-  team       = str_pad(string = team,
-                       width  = 2,
-                       side   = "left") %>%
-               paste0("Team", .),
-  day        = factor(x   = day,
-                      levels = c("Saturday", "Sunday",
-                                 "Monday", "Tuesday",
-                                 "Wednesday", "Thursday", "Friday")),
-  department = str_trim(department) %>%
-               ifelse(. %in% "sweing", "sewing", .)
-  
-  
-)
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
 
-# create lists to feed the control widgets
-department_list <- setNames(nm = sort(unique(data$department)))
-team_list       <- setNames(nm = sort(unique(data$team)))
+# set the path to exercises
+setwd(analyses_dir)
 
-# set starting selection for department and team
-dept_starting_selection <- department_list[2]
-team_starting_selection <- team_list[1:2]
+# To clean things up - running what's needed for all apps
+source('0-global.R')
 
-# text labels for action button for showing/hiding reporting
-reporting_button_text   <- c("Hide Reporting", "Show Reporting")
+#########
+# INTRO #
+#########
 
-# 2. Functions =================================================================
+# intro_displayr()
 
-makeplot2 <- function(dat, dept, trendline){
-  
-  trendline_txt <- c("", "Trendline drawn")[trendline + 1]
-  
-  g <- ggplot(data    = dat,
-              mapping = aes(x     = incentive, 
-                            y     = actual_productivity,
-                            color = team)) + 
-      geom_point(alpha = 0.7) + 
-      labs(title    = paste("Department:", dept), 
-           caption  = trendline_txt,
-           subtitle = "Incentive vs Actual Productivity")
-  
-  if (trendline) {
-    g <- g + geom_smooth(formula = y ~ x, method = lm, alpha = 0.15)
-  }
-  
-  g
-}
-
-makeplotdata <- function(dat, dept, tm = NULL){
-  
-  dd <- dat[dat$department %in% dept, ]
-  
-  if (!is.null(tm)) {
-    dd <- dd[dd$team %in% tm, ]
-  }
-  
-  return(dd)
-}
-
-# 3. Create Modules (NEW!!!) ===================================================
+# 1. Create Modules (NEW!!!) ===================================================
 
 library(shiny)
 
@@ -90,11 +41,17 @@ productivityDisplayUI <- function(id){
   # - make sure that every id is surrounded by the namespace function (ns)
   # - make sure everything is wrapped within a tagList to return
   tagList(
+    
+    # REPORTING BUTTON #
     div(id = ns("Reporting"),
         textOutput(ns("actual_productivity_statement")),
         tableOutput(ns("actual_productivity_week"))),
+    
+    # PLOT OUTPUTS #
     plotOutput(outputId = ns("plot"),
                click    = ns("plot_click")),
+    
+    # TABLE OUTPUTS #
     "Click somewhere on the plot to see data near it.",
     tableOutput(ns("data_at_clickpoint"))
   )
@@ -102,7 +59,7 @@ productivityDisplayUI <- function(id){
 
 productivityDisplayServer <- function(id, data,
                                       dept      = "sewing",
-                                      tm        = NULL,
+                                      team      = NULL,
                                       trendline = TRUE,
                                       reporting = TRUE){
   
@@ -117,26 +74,31 @@ productivityDisplayServer <- function(id, data,
       # not likely to be needed, but JUST IN CASE
       ns        <- session$ns
 
+      # MAKE PLOT DATA #
+      
       # - fixed  stuff are passed as simple arguments
       # - change stuff are passed as reactives that need to be evaluated
       plot_data <- reactive({
-        makeplotdata(
+        data_team_subset(
           dat   = data,   # data is a fixed data.frame
           dept  = dept,   # dept is a fixed char for a given panel
-          tm    = tm()    # tm are the teams that can change
+          team  = team()  # team are the teams that can change
         )
       })
 
       # - fixed  stuff are passed as simple arguments
       # - change stuff are passed as reactives that need to be evaluated
       plot_gg   <- reactive({
-        makeplot2(
+        incentive_plot(
           dat       = plot_data(), # plot data changes above!
           dept      = dept,        # dept is a fixed char for a given panel
+          team      = team(),      # team are the teams that can change
           trendline = trendline()  # trendline is the linear line that can change
         )
       })
-
+      
+      # PLOT #
+      
       # can add plot to output (NO NEED TO USE NS) ... SAME AS BEFORE
       output$plot <- renderPlot(
         expr = {
@@ -148,8 +110,10 @@ productivityDisplayServer <- function(id, data,
         },
         res  = 96
       )
+      
+      # CLICK-POINT FUNCTIONALITY #
 
-      # can add clickpoint data (NO NEED TO USE NS) ... SAMEISH AS BEFORE
+      # can add clickpoint data (NO NEED TO USE NS)
       click_point_data <- reactiveVal(NULL)
       
       observeEvent(input$plot_click, {
@@ -161,6 +125,8 @@ productivityDisplayServer <- function(id, data,
         click_point_data()
       })
 
+      # PRODUCTIVITY REPORTING OUTPUTS # 
+      
       # can update report button
       observeEvent(reporting(), { # passed as a reactive value and evaluated
 
@@ -170,12 +136,14 @@ productivityDisplayServer <- function(id, data,
 
       })
 
-      # can update text (NO NEED TO USE NS) ... SAME AS BEFORE
+      # GENERATE PRODUCTIVITY STATEMENT # 
+      
+      # can update text (NO NEED TO USE NS)
       output$actual_productivity_statement <- renderText({
         req(plot_data())
 
-        # tm is passed as reactive value, everything else the same
-        teams    <- tm()
+        # team is passed as reactive value, everything else the same
+        teams    <- team()
         n_teams  <- length(teams)
         team_txt <- paste(teams, collapse = ", ")
 
@@ -208,20 +176,15 @@ productivityDisplayServer <- function(id, data,
         setNames(c("day", "average actual productivity"))
       })
 
-      # can pass something back to the calling function as a
-      # -NO parentheses, not evaluated, just reactive
+      # can pass something back to the calling function as a reactive
+      # - NO parentheses, not evaluated, just reactive
       return(plot_data)
     }
   )
   
 }
 
-# 3. Application ===============================================================
-
-library(shinyjs)
-library(ggplot2)
-library(thematic)
-library(bslib)
+# 2. Application ===============================================================
 
 thematic_shiny(bg = "gray10",
                fg = 'slategray3')
@@ -247,8 +210,10 @@ prod_panels_all <- do.call(what = tabsetPanel,
 ### B. Put Everything in UI/Server ---------------------------------------------
 ui <- fluidPage(
   
+  # NECESSARY CALL TO USE SHINYJS #
   useShinyjs(),
   
+  # CREATE A BOTTSTRAP THEME #
   theme = bs_theme(bg        = "#345678",
                    fg        = "white",
                    primary   = "tomato",
@@ -256,31 +221,42 @@ ui <- fluidPage(
                    danger    = "lightcyan",
                    base_font = font_google("Redressed")),
   
-  titlePanel("App 9: Shiny Modules"),
+  # TITLE #
+  titlePanel("App 10: Shiny Modules"),
   
+  # SIDEBAR #
   sidebarLayout(
     sidebarPanel(
       h4("Select these:"),
+      
       # get rid of radio, as this will be done in panels
+      
+      # SELECTING TEAM BY A LIST # 
       selectInput(inputId  = "select",
                   label    = h5("Teams"), 
                   choices  = team_list,
                   multiple = TRUE,
                   selected = team_starting_selection),
       
+      # TRENDLINE # 
       h4("Additional controls:"),
       checkboxInput(inputId = "checkbox",
                     label   = "Plot regression line for each team?",
                     value   = FALSE),
-      hr(),
+      
+      # ACTION BUTTON TO SHOW/HIDE REPORTING #
       actionButton(inputId = "button",
                    label   = reporting_button_text[1], 
                    class   = "btn-warning"),
       
+      # DOWNLOAD BUTTON #
       # add download button to download the data
       downloadButton("download_data"),
       
+      # BREAK #
       hr(),
+      
+      # DATA SOURCE #
       h4("Source Data"),
       p("The ", 
         a("Productivity Prediction Garment Employees Dataset", 
@@ -291,6 +267,7 @@ ui <- fluidPage(
       
     ),
     
+    # MAIN #
     # already created this earlier
     mainPanel(prod_panels_all),
   )
@@ -299,10 +276,12 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
+  # REACTIVE OUTPUTS #
   trendline              <- reactive(input$checkbox)
   reporting_button_state <- reactive(input$button)
   
   # get rid of dept_selected, as this will be fixed
+  
   team_selected          <- reactive(input$select)
   
   # GET RID OF ALL PLOTTING/DATA/TABLES (NOW IN MODULE)
@@ -316,6 +295,7 @@ server <- function(input, output, session) {
   
   # GET RID OF ALL PLOTTING/DATA/TABLES (NOW IN MODULE)
   
+  # MODULE CALL #
   # add module information (Map/lapply works better than for loops)
   plot_data  <- lapply(
     X   = setNames(nm = prod_ids),
@@ -324,14 +304,14 @@ server <- function(input, output, session) {
         id        = id,                    # fixed in a given tab
         data      = data,                  # fixed for all tabs
         dept      = id,                    # fixed for a given tab
-        tm        = team_selected,         # pass REACTIVE
+        team      = team_selected,         # pass REACTIVE
         trendline = trendline,             # pass REACTIVE
         reporting = reporting_button_state # pass REACTIVE
       )
     }
   )
   
-  # add download handler to download the data
+  # DOWNLOAD HANDLER #
   # - need filename argument (how to create filename)
   # - need content argument (what to DO with file)
   output$download_data <- downloadHandler(

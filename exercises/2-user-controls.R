@@ -13,17 +13,18 @@
 # get the project directory
 project_dir    <- here::here()
 analyses_dir   <- file.path(project_dir, "exercises")
-function_dir   <- file.path(project_dir, "exercises", "R")
 data_dir       <- file.path(project_dir, "data")
 
 # set the path to excercises
 setwd(analyses_dir)
 
+# To clean things up - running what's needed for all apps
+source('0-global.R')
+
 #########
 # INTRO #
 #########
-source(file.path(function_dir, 'intro_displayr.R'), 
-       local = FALSE)
+
 intro_displayr()
 
 ###########################

@@ -11,7 +11,6 @@
 project_dir    <- here::here()
 analyses_dir   <- file.path(project_dir, "exercises")
 data_dir       <- file.path(project_dir, "data")
-function_dir   <- file.path(project_dir, "exercises", "R")
 
 # set the path to excercises
 setwd(analyses_dir)
