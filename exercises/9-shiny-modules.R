@@ -24,7 +24,7 @@ source('0-global.R')
 # INTRO #
 #########
 
-# intro_displayr()
+intro_displayr()
 
 # 1. Create Modules (NEW!!!) ===================================================
 

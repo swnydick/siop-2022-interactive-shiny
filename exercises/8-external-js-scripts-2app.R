@@ -24,7 +24,7 @@ source('0-global.R')
 # INTRO #
 #########
 
-# intro_displayr()
+intro_displayr()
 
 # 1. Application ===============================================================
 thematic_shiny(bg = "gray10",
@@ -45,7 +45,7 @@ ui <- fluidPage(
                    base_font = font_google("Redressed")),
   
   # TITLE #
-  titlePanel("App 8: Integration JS"),
+  titlePanel("App 8: JS Integration"),
   
   # SIDEBAR #
   sidebarLayout(

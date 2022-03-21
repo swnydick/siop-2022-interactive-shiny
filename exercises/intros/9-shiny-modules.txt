@@ -1,0 +1,8 @@
+<h3><span style="color: #006550;"><strong>App 9:&nbsp; Shiny Modules</strong></span></h3>
+<p><span style="color: #000000;">In App 9 we will demonstrate how to modularize your applications.&nbsp;</span></p>
+<p><span style="color: #000000;">Below is a list of the new code introduced:</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;"><strong>ui</strong>: NS, tagList</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;"><strong>server</strong>: moduleServer</span></p>
+<p><span style="color: #000000;">At the end of this tutorial, you will be able to take a shiny app and divde the app into independent pieces.&nbsp; Additionally, you could turn your shiny app into a package.&nbsp; The last demonstration will cover some of the odd pitfalls of developing shiny applications.&nbsp;&nbsp;</span><span style="color: #494849;"></span></p>
+<p></p>
+<p></p>
