@@ -8,6 +8,7 @@
 ##############
 # SETTING UP #
 ##############
+
 # Set wd to avoid confusion between what's run within project versus app
 # get the project directory
 project_dir    <- here::here()

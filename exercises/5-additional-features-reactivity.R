@@ -5,6 +5,10 @@
 # 2022-04-29                               #
 ############################################
 
+##############
+# SETTING UP #
+##############
+
 # Set wd to avoid confusion between what's run within project versus app
 # get the project directory
 project_dir    <- here::here()
@@ -16,10 +20,7 @@ setwd(analyses_dir)
 # To clean things up - running what's needed for all apps
 source('0-global.R')
 
-#########
-# INTRO #
-#########
-
+# INTRO # 
 intro_displayr()
 
 ######

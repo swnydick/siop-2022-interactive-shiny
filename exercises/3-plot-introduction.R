@@ -24,10 +24,7 @@ source('0-global.R')
 # library(ggplot2)
 # library(dplyr)
 
-#########
-# INTRO #
-#########
-
+# INTRO # 
 intro_displayr()
 
 ######

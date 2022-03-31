@@ -22,10 +22,7 @@ setwd(analyses_dir)
 # To clean things up - running what's needed for all apps
 source('0-global.R')
 
-#########
-# INTRO #
-#########
-
+# INTRO # 
 intro_displayr()
 
 ######
