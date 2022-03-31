@@ -119,4 +119,4 @@ intro_displayr <-
         )
       )
     )
-  }
+  } # End intro displayr

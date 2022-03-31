@@ -1,4 +1,0 @@
-<h3><span style="color: #006550;"><strong>App 5: Introduction to Reactivity&nbsp;</strong></span></h3>
-<p>App 5 will contain no visual differences from app 4 - but will show us a different way to reference the department and team selections in our code.&nbsp; See below for a description of this difference.&nbsp;</p>
-<p style="padding-left: 40px;"><span style="color: #494849;"><strong>reactive( )</strong> : Makes a normal expression into a reactive expression, which means its result can change over time.&nbsp; It caches its previous result until something triggers its change (in this case when someone changes the selection for department or team)</span></p>
-<p></p>

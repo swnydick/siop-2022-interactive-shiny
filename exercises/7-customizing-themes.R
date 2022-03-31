@@ -27,12 +27,11 @@ source('0-global.R')
 intro_displayr()
 
 ## New libraries for customising your own themes
-# library(thematic)
-# library(bslib)
+library(thematic)
+library(bslib)
 # customise pretty colours for the ggplots bit: you can use R colours here
 # note the default discrete scale okabe_ito() has only 8 colours: 
 # anything more than that defaults to ggplot2
-
 thematic_shiny(bg = "gray10", 
                fg = 'slategray3')
 theme_set(theme_bw()) ## setting the ggplot theme here globally instead of within the plotting function previously
@@ -129,9 +128,9 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   # REACTIVE OUTPUTS #
-  dept_selected <- reactive(input$radio)
-  team_selected <- reactive(input$select)
-  trendline     <- reactive(input$checkbox)
+  dept_selected          <- reactive(input$radio)
+  team_selected          <- reactive(input$select)
+  trendline              <- reactive(input$checkbox)
   reporting_button_state <- reactive(input$button)
   
   # MAKE PLOT DATA #
@@ -162,8 +161,10 @@ server <- function(input, output) {
   
   ## toggles reporting section based on button input
   observeEvent(reporting_button_state(), {
-    toggle(id = "Reporting", anim = TRUE) 
-    toggleClass("button", "btn-danger") 
+    toggle(id   = "Reporting", 
+           anim = TRUE) 
+    toggleClass(id    = "button", 
+                class = "btn-danger") 
     html("button", ifelse((reporting_button_state() %% 2) == 0 , 
                           reporting_button_text[1] , 
                           reporting_button_text[2]))

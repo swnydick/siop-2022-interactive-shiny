@@ -1,4 +1,9 @@
-<h3><span style="color: #006550;"><strong>App 7: Customization of Themes</strong></span></h3>
-<p>In App 7, we'll introduce you to 2 new libraries for customizing the appearance of your ui.&nbsp; These packages are the following :</p>
-<p style="padding-left: 40px;">thematic :&nbsp;</p>
-<p style="padding-left: 40px;">&nbsp;</p>
+<h2><span style="color: #006550;">App<strong> 7: Customization of Themes</strong></span></h2>
+<p>In App 7, we'll introduce you to 2 new packages (thematic, bslib) that contain tools to customize the appearance of the ui.&nbsp;</p>
+<p>The thematic package allows for a unified and automatic way of customizing plot themes - and can be applied to base R, ggplot, and shiny plots. See <a href="https://rstudio.github.io/thematic/">Unified and Automatic Theming of ggplot2, lattice, and base R Graphics &bull; thematic (rstudio.github.io)</a> for more details.&nbsp;</p>
+<p>The bslib package allows you to create custom bootstrap themes within shiny (a bootstrap theme is a custom web template).&nbsp; See <a href="https://rstudio.github.io/bslib/">Custom Bootstrap Sass Themes for shiny and rmarkdown &bull; bslib (rstudio.github.io)</a> for more details.&nbsp;&nbsp;</p>
+<p>Specifically, the functions below will be introduced :&nbsp;</p>
+<p style="padding-left: 40px;"><span style="color: #494849;">thematic : thematic_shiny( ),</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;">ggplot : theme_set( )</span></p>
+<p style="padding-left: 40px;"><span style="color: #494849;">bslib: bs_theme( )</span></p>
+<p><span style="color: #494849;"></span></p>

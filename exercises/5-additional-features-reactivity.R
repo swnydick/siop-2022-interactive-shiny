@@ -1,34 +1,25 @@
-# To do this, let's modify the plotting function to split it into two functions: 
-# one for plotting, and 
-# a second to return a reactive dataset
-# since we will be re-using this reactive dataset in the table output
-#
-# As example, compare the table outputs when you click on 
-# (department = sweing) incentive = 113
-# between no teams are selected (notice that teams using incentive 113 = teams 1,2,3,10)
-# while after you select on teams 1 and 2, 
-# the table output subsets itself appropriately.
-#
-# Notice data$date has been coerced from Date to as.character as Shiny doesn't
-# seem to like display as.Date as a character....
-#
-# 
-# [B] Let's also swap the initial department and team selection with something
-# more 'reporting-like': a sentence describing the average actual productivity,
-# and a table showing the average actual productivity by day of week.
-#
-# [C]: let's also add the ability to toggle a regression line  
-#
-# Continue to talk about reactivity and reuse....
+############################################
+# Additional Features and Reactivity con't #
+#                                          #
+# Korn Ferry Institute: Automation Team    #
+# 2022-04-29                               #
+############################################
 
-##############
-# SETTING UP #
-##############
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
 
-# DATE DISPLAY ISSUE # 
-data$date <- as.character(data$date)
+# set the path to excercises
+setwd(analyses_dir)
 
-# INTRO # 
+# To clean things up - running what's needed for all apps
+source('0-global.R')
+
+#########
+# INTRO #
+#########
+
 intro_displayr()
 
 ######
@@ -85,14 +76,17 @@ ui <- fluidPage(
     mainPanel(
       
       # REPORTING OUTPUTS # 
+      # Stores the ids for the reporting text and reporting table
       textOutput(outputId  = "actual_productivity_statement"),
       tableOutput(outputId = "actual_productivity_week"),
       
       # PLOT OUTPUTS # 
+      # Stores the ids for the plot and the click-action
       plotOutput(outputId = "plot", 
                  click    = "plot_click"),
       
       # TABLE OUTPUTS # 
+      # Stores the ids for the reactive table
       "Click somewhere on the plot to see data near it.",
       tableOutput(outputId = "data_at_clickpoint")
       
@@ -108,9 +102,9 @@ server <- function(input, output) {
   
   # REACTIVE OUTPUTS # 
   # Adding a trendline - and introducing a new control widget - checkbox 
-  dept_selected <- reactive(x = input$radio)
-  team_selected <- reactive(x = input$select)
-  trendline     <- reactive(x = input$checkbox)
+  dept_selected <- reactive(input$radio)
+  team_selected <- reactive(input$select)
+  trendline     <- reactive(input$checkbox)
   
   # REACTIVE DATA # 
   plot_data <- reactive(x = data_team_subset(data = data, 
@@ -125,15 +119,15 @@ server <- function(input, output) {
                             res = 96)
   
   ## ADDING PLOT FUNCTIONALITY : nearPoints ## 
-    # This will allow the user to click near a point and see the exact data near 
-      # that point.
+  # This will allow the user to click near a point and see the exact data near 
+  # that point.
   
   # reactiveVal is used to store the data from the clicked point
   click_point_data <- reactiveVal(NULL)
   
   # observeEvent - bases actions on whether a new click has occurred
   # req - makes sure that a click actually exists
-  # click_point_data - this reactive gets filled with the data from the clickec point
+  # click_point_data - this reactive gets filled with the data from the clicked point
   observeEvent(input$plot_click, {
     req(input$plot_click)
     click_point_data(nearPoints(df        = plot_data(), 
@@ -156,7 +150,8 @@ server <- function(input, output) {
                          paste0(team_selected(), collapse = ", ") ,
                          ifelse(length(team_selected()) < 2, "has ", "have ")
                        )
-    ) 
+    )
+    
     # This combines the team and department text 
     # Example : 'sewing's Team 1, Team 2 have an average actual_productivity of 0.79
     paste0(dept_selected(),
@@ -173,7 +168,8 @@ server <- function(input, output) {
     act_prod_wk <- aggregate.data.frame(x   = plot_data()$actual_productivity, 
                                         by  = list(plot_data()$day), 
                                         FUN = mean)
-    setNames(object = act_prod_wk, nm = c('day', 'average actual productivity'))
+    setNames(object = act_prod_wk, 
+             nm     = c('day', 'average actual productivity'))
   }) # End productivity table
   
 } # End server

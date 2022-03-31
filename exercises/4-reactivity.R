@@ -1,5 +1,5 @@
 #########################################
-# Plot Introduction                     #
+# Introduction to Reactivity            #
 #                                       #
 # Korn Ferry Institute: Automation Team #
 # 2022-04-29                            #

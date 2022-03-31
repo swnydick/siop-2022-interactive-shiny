@@ -5,16 +5,25 @@
 # 2022-04-29                            #
 #########################################
 
-
 ##############
 # SETTING UP #
 ##############
+# Set wd to avoid confusion between what's run within project versus app
+# get the project directory
+project_dir    <- here::here()
+analyses_dir   <- file.path(project_dir, "exercises")
 
-# New Library # 
-library(shinyjs)
+# set the path to excercises
+setwd(analyses_dir)
+
+# To clean things up - running what's needed for all apps
+source('0-global.R')
+
+# Note - need some new items - but these are sourced in global 
+# library(shinyjs)
 
 # text labels for action button for showing/hiding reporting
-reporting_button_text <- c("Hide Reporting", "Show Reporting")
+# reporting_button_text <- c("Hide Reporting", "Show Reporting")
 
 # INTRO # 
 intro_displayr()
@@ -78,7 +87,7 @@ ui <- fluidPage(
               Please visit the link for source and data dictionary."
       ) # End paragraph
       
-    ), # end sidebarpanel
+    ), # End sidebarpanel
     
     # MAIN # 
     mainPanel(
@@ -93,15 +102,16 @@ ui <- fluidPage(
       ),
       
       # PLOT OUTPUTS # 
-      plotOutput("plot", click = "plot_click"),
+      plotOutput(outputId = "plot", 
+                 click    = "plot_click"),
       
       # TABLE OUTPUTS # 
       "Click somewhere on the plot to see data near it.",
       tableOutput("data_at_clickpoint")
       
-    ) # end mainPanel
-  ) # end sidebarLayout
-) # end ui
+    ) # End mainPanel
+  ) # End sidebarLayout
+) # End ui
 
 ##########
 # SERVER #
@@ -111,9 +121,9 @@ server <- function(input, output) {
   
   ## REACTIVE OUTPUTS ##
   # Note the addition of the reporting button - provided as a state
-  dept_selected <- reactive(x = input$radio)
-  team_selected <- reactive(x = input$select)
-  trendline     <- reactive(x = input$checkbox)
+  dept_selected          <- reactive(input$radio)
+  team_selected          <- reactive(input$select)
+  trendline              <- reactive(input$checkbox)
   reporting_button_state <- reactive(input$button)
   
   # MAKE PLOT DATA # 
@@ -130,7 +140,7 @@ server <- function(input, output) {
   
   ## ADDING PLOT FUNCTIONALITY : nearPoints ## 
   click_point_data <- reactiveVal(NULL)
-  
+
   observeEvent(input$plot_click, {
     req(input$plot_click)
     click_point_data(nearPoints(df        = plot_data(), 
@@ -146,10 +156,12 @@ server <- function(input, output) {
   # it then either shows or hides the reporting options 
   observeEvent(reporting_button_state(), {
     
-    toggle(id = "Reporting", anim = TRUE) # hide or show
-    toggleClass("button", "btn-danger") # toggled button colour
+    toggle(id   = "Reporting", 
+           anim = TRUE) # hide or show
+    toggleClass(id    = "button", 
+                class = "btn-danger") # toggled button colour
     
-    # recall that input$button starts with value 0 increments by 1 everytime you click on it.
+    # recall that input$button starts with value 0 increments by 1 every time you click on it.
     # use even/odd state to toggle between the two states of hide/show
     html("button", ifelse((reporting_button_state() %% 2) == 0 , 
                            reporting_button_text[1] , 
@@ -189,7 +201,7 @@ server <- function(input, output) {
     setNames(object = act_prod_wk, nm = c('day', 'average actual productivity'))
   })
   
-}
+} #End server
 
 #######
 # RUN #
