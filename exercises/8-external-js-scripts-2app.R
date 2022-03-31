@@ -37,12 +37,12 @@ ui <- fluidPage(
   useShinyjs(),
   
   # CREATE A BOTTSTRAP THEME #
-  theme = bs_theme(bg        = "#345678",
-                   fg        = "white",
-                   primary   = "tomato",
-                   warning   = "gold", 
-                   danger    = "lightcyan",
-                   base_font = font_google("Redressed")),
+  # theme = bs_theme(bg        = "#345678",
+  #                  fg        = "white",
+  #                  primary   = "tomato",
+  #                  warning   = "gold",
+  #                  danger    = "lightcyan",
+  #                  base_font = font_google("Redressed")),
   
   # TITLE #
   titlePanel("App 8: JS Integration"),
