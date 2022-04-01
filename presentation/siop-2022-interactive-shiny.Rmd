@@ -3,7 +3,7 @@ title: "Interactive Dashboards with R and Shiny"
 author:
 - "Steven Nydick"
 - "Fiona Lodge"
-- "Yu-Ann Want"
+- "Yu-Ann Wang"
 date: "April 29, 2022"
 output:
   slidy_presentation:
