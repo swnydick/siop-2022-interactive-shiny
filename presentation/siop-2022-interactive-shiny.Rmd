@@ -1,14 +1,17 @@
 ---
 title: "Interactive Dashboards with R and Shiny"
 author:
-- "Steven Nydick"
-- "Fiona Lodge"
-- "Yu-Ann Wang"
+- Steven Nydick
+- Fiona Lodge
+- Yu-Ann Wang
 date: "April 29, 2022"
 output:
+  beamer_presentation: default
   slidy_presentation:
-    footer: "Copyright \u00A9 2022, Korn Ferry"
-    css: ['styles.css', 'https://fonts.googleapis.com/css?family=Open+Sans']
+    footer: Copyright © 2022, Korn Ferry
+    css:
+    - styles.css
+    - https://fonts.googleapis.com/css?family=Open+Sans
 ---
 
 ```{r setup, include=FALSE}
