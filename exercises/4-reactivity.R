@@ -87,9 +87,10 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   ## REACTIVE OUTPUTS ##
-  # Instead of calling input$radio twice, reactive values are used
+  # Instead of calling input$radio twice as in the previous app, 
+  # reactive values are used here.
   # Reactive values are created to store user selections
-  # They only change when something triggers it - otherwise they use they store 
+  # They only change when something triggers it - otherwise they use  
   # the previous result. 
   # This is part of what makes shiny 'imperative' versus 'declarative'.
   dept_selected <- reactive(input$radio)
@@ -102,8 +103,8 @@ server <- function(input, output) {
   output$team_value       <- renderPrint(team_selected())
   
   ## REACTIVE DATA ## 
-  # Here, we make the data reactive - so that we can better call if to other 
-  # functions later. 
+  # Here, we make the data reactive - so that we can better call it to 
+  # subsequent functions. 
   plot_data <- reactive(x = data_team_subset(data = data, 
                                              dept = dept_selected(), 
                                              team = team_selected())) 

@@ -41,7 +41,7 @@ ui <- fluidPage(
   useShinyjs(),
   
   # TITLE # 
-  titlePanel("App 6: Adding Javascript components"),
+  titlePanel("App 6: Adding Javascript Components"),
   
   # SIDEBAR #
   sidebarLayout(
@@ -71,7 +71,7 @@ ui <- fluidPage(
       # the class attribute provides some color via Bootstrap
       # see https://getbootstrap.com/docs/4.0/components/buttons/
       # See also the related observeEvent(input$button, ...)
-      # for the change in text and colour when this button is clicked
+      # for the change in text and color when this button is clicked
       actionButton(inputId = "button", 
                    label   = reporting_button_text[1], 
                    class   = "btn-warning"),
@@ -130,7 +130,7 @@ server <- function(input, output) {
   # MAKE PLOT DATA # 
   plot_data <- reactive(x = data_team_subset(data = data, 
                                              dept = dept_selected(), 
-                                             team = team_selected())) # End plot data
+                                             team = team_selected()))
   
   # PLOT # 
   output$plot <- renderPlot(expr = incentive_plot(data      = plot_data(), 
@@ -160,9 +160,10 @@ server <- function(input, output) {
     toggle(id   = "Reporting", 
            anim = TRUE) # hide or show
     toggleClass(id    = "button", 
-                class = "btn-danger") # toggled button colour
+                class = "btn-danger") # toggled button color
     
-    # recall that input$button starts with value 0 increments by 1 every time you click on it.
+    # recall that input$button starts with value 0 and increases by 1 
+    # every time you click on it.
     # use even/odd state to toggle between the two states of hide/show
     html("button", ifelse((reporting_button_state() %% 2) == 0 , 
                            reporting_button_text[1] , 
@@ -172,16 +173,16 @@ server <- function(input, output) {
   # GENERATE PRODUCTIVITY STATEMENT # 
   output$actual_productivity_statement <- renderText({
     
-    # This generates the text to display about the teams productivity # 
+    # This generates the text to display the team(s) selected 
     team_txt <- ifelse(is.null(team_selected()), 
-                       "all teams have ", # need this and the last clarifier if all teams
+                       "all teams have ",
                        paste(
                          paste0(team_selected(), collapse = ", ") ,
                          ifelse(length(team_selected()) < 2, "has ", "have ")
                        )
     ) 
     
-    # This combines the team and department text
+    # This combines the team and department text with their productivity value
     paste0(
         dept_selected(),
         "'s ",

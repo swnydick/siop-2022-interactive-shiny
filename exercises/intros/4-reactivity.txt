@@ -1,4 +1,4 @@
-<h3><span style="color: #006550;"><strong>App 4: Introduction to reactivity</strong></span></h3>
+<h3><span style="color: #006550;"><strong>App 4: Introduction to Reactivity</strong></span></h3>
 <p><span style="color: #000000;">In App 4 we'll introduce reactivity, and use it to make our code more efficient.&nbsp; We can have a 1:many situation in shiny.&nbsp; For example, there may be one input element that corresponds with many different outputs.&nbsp; We can simplify this by wrapping the input in a reactive expression - meaning we now only have to reference this reactive in the many outputs. Specific concepts introduced include :&nbsp;</span></p>
 <p style="padding-left: 40px;"><span style="color: #494849;">reactive( ) and how to use/call this after it's created</span></p>
 <p><span style="color: #000000;">At the end of this tutorial, you will understand the basics of a reactive expression.&nbsp; In later tutorials - we will dive a little deeper into how reactive utilities.&nbsp;</span><span style="color: #494849;"></span></p>

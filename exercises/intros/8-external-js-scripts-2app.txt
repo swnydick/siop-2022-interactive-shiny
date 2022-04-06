@@ -3,6 +3,6 @@
 <p><span style="color: #000000;">Below is a list of the new code introduced:</span></p>
 <p style="padding-left: 40px;"><span style="color: #494849;"><strong>htmltools</strong>: htmlDependency, attachDependencies</span></p>
 <p style="padding-left: 40px;"><span style="color: #494849;"><strong>shinyjs</strong>: useShinyjs, runjs</span></p>
-<p><span style="color: #000000;">At the end of this tutorial, you will understand how to find download javascript files and integrate those files within a shiny app.&nbsp; Note that there are many ways to integrate javascript into shiny, and we are covering one of the simplest integrations.&nbsp; The next app will cover shiny modules and how to create reusable shiny code.&nbsp;&nbsp;</span><span style="color: #494849;"></span></p>
+<p><span style="color: #000000;">At the end of this tutorial, you will understand how to find and download javascript files and integrate those files within a shiny app.&nbsp; Note that there are many ways to integrate javascript into shiny, and we are covering one of the simplest integrations.&nbsp; The next app will cover shiny modules and how to create reusable shiny code.&nbsp;&nbsp;</span><span style="color: #494849;"></span></p>
 <p></p>
 <p></p>

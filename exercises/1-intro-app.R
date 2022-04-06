@@ -42,15 +42,15 @@ ui <- fluidPage(
       ## PRINT HELLO ## 
       # htmltools are exported into shiny - there are several 
       # useful functions to create html tags using an r language.  
-      # p() is an tag that corresponds to <p></p> (paragraph)
+      # p() is a tag that corresponds to <p></p> (paragraph)
       p("hello"),
       
-      # hr() breaks to a new style
+      # hr() corresponds to <hr> to create a horizontal rule
       hr(),
       
       ## DATA SOURCE ## 
-      # h4() is an tag that corresponds to header levels (the size of the header)
-      # a(, href) corresponds to <a href></a> etc. to create reference to a link.
+      # h4() is a tag that corresponds to header levels (the size of the header)
+      # a(, href) corresponds to <a href></a> to create reference to a link.
       h4("Source Data"),
       p("The ", 
         a("Productivity Prediction Garment Employees Dataset", 

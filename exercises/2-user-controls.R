@@ -38,7 +38,7 @@ data <- readRDS(file.path(data_dir, 'garments_worker_productivity_cleaned.rds'))
 # View(head(data))
 
 # FIND UI LISTS # 
-# The ui will need to have a lists of choices for the buttons and check box.
+# The ui will need to have lists of choices for the buttons and check box.
 department_list <- setNames(nm = sort(unique(data$department)))
 team_list       <- setNames(nm = sort(unique(data$team)))
 
@@ -69,7 +69,7 @@ ui <- fluidPage(
       # always need an inputId - (server function(s) will operate on this id)
       # label will produce a title on the page for the control
       # choices are what the user can choose - we defined this earlier
-      # selected is the initial choices
+      # selected is the initial choice
       h4("Select these:"),
       radioButtons(inputId  = "radio", 
                    label    = h5("Department"),

@@ -143,7 +143,7 @@ server <- function(input, output) {
   # GENERATE PRODUCTIVITY STATEMENT # 
   output$actual_productivity_statement <- renderText({
     
-    # This generates the text to display about the teams productivity # 
+    # This generates the text to display the team(s) selected 
     # Example : Team 1, Team 2 have
     team_txt <- ifelse(is.null(team_selected()), 
                        "all teams have ", 
@@ -153,7 +153,7 @@ server <- function(input, output) {
                        )
     )
     
-    # This combines the team and department text 
+    # This combines the team and department text with their productivity value
     # Example : 'sewing's Team 1, Team 2 have an average actual_productivity of 0.79
     paste0(dept_selected(),
            "'s ",

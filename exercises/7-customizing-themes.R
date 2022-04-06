@@ -23,15 +23,16 @@ source('0-global.R')
 # INTRO # 
 intro_displayr()
 
-## New libraries for customising your own themes
+## New libraries for customizing themes
 library(thematic)
 library(bslib)
-# customise pretty colours for the ggplots bit: you can use R colours here
-# note the default discrete scale okabe_ito() has only 8 colours: 
-# anything more than that defaults to ggplot2
+# Here, we customize colors for ggplots: you can use R color names here
+# Note the default discrete scale okabe_ito() has only 8 colors: 
+# any plots requiring more than 8 colors will revert to ggplot2's default scheme.
 thematic_shiny(bg = "gray10", 
                fg = 'slategray3')
-theme_set(theme_bw()) ## setting the ggplot theme here globally instead of within the plotting function previously
+# Set the ggplot theme here globally
+theme_set(theme_bw()) 
 
 ######
 # UI #
@@ -44,13 +45,13 @@ ui <- fluidPage(
   useShinyjs(),
   
   ## CREATE A BOTTSTRAP THEME ##
-  # Use this to set requirements for a bootstrap theme - there are a lot more options 
+  # Use this to set requirements for a bootstrap theme - there are many more options 
   # available, such as setting more font options.
   theme = bs_theme(bg        = "#345678",
                    fg        = "white",
-                   primary   = "tomato", # the link is picking up the primary colour
-                   warning   = "gold", # bootstrap colour applied to the show/hide reporting button
-                   danger    = "lightcyan",
+                   primary   = "tomato", # the link is picking up this color
+                   warning   = "gold", # starting color for the show/hide reporting button
+                   danger    = "lightcyan", # toggled color for the show/hide reporting button
                    base_font = font_google("Redressed")),
   
   # TITLE #
@@ -133,7 +134,7 @@ server <- function(input, output) {
   # MAKE PLOT DATA #
   plot_data <- reactive(x = data_team_subset(data = data, 
                                              dept = dept_selected(), 
-                                             team = team_selected())) # End plot data
+                                             team = team_selected())) 
   
   # PLOT # 
   output$plot <- renderPlot(expr = incentive_plot(data      = plot_data(), 
@@ -170,16 +171,16 @@ server <- function(input, output) {
   # GENERATE PRODUCTIVITY STATEMENT # 
   output$actual_productivity_statement <- renderText({
     
-    # This generates the text to display about the teams productivity # 
+    # This generates the text to display the team(s) selected 
     team_txt <- ifelse(is.null(team_selected()), 
-                       "all teams have ", # need this and the last clarifier if all teams
+                       "all teams have ", 
                        paste(
                          paste0(team_selected(), collapse = ", ") ,
                          ifelse(length(team_selected()) < 2, "has ", "have ")
                        )
     ) 
     
-    # This combines the team and department text
+    # This combines the team and department text with their productivity value
     paste0(
       dept_selected(),
       "'s ",
@@ -202,6 +203,6 @@ server <- function(input, output) {
 # RUN #
 #######
 
-# The theme seems to carry over to other plots - turn this off if you want to reset the theme.
+# Turn this off to reset the theme.
 # thematic_off()
 shinyApp(ui = ui, server = server)
