@@ -220,7 +220,7 @@ ui <- fluidPage(
                    base_font = font_google("Redressed")),
   
   # TITLE #
-  titlePanel("App 10: Shiny Modules"),
+  titlePanel("App 9: Shiny Modules"),
   
   # SIDEBAR #
   sidebarLayout(
