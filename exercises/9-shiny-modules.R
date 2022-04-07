@@ -288,7 +288,7 @@ server <- function(input, output, session) {
   observeEvent(reporting_button_state(), {
     toggleClass("button", "btn-danger") 
     html("button",
-         reporting_button_text[((reporting_button_state() %% 2) == 0) + 1])
+         reporting_button_text[((reporting_button_state() %% 2) != 0) + 1])
   }) 
   
   # GET RID OF ALL PLOTTING/DATA/TABLES (NOW IN MODULE)

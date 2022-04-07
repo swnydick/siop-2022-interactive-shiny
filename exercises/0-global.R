@@ -85,7 +85,7 @@ data_team_subset <- function(data, dept, team = NULL){
   return(dd)
 }
 
-# ################
+##################
 # INTRO DISPLAYR #
 ##################
 
@@ -120,3 +120,94 @@ intro_displayr <-
       )
     )
   } # End intro displayr
+
+################
+# LADDA BUTTON #
+################
+
+# copied from 8-external-js-scripts-1ladda.R (see that script for comments)
+
+# indicate the directory to install included stuff
+assets_dir    <- "assets"
+ladda_dir     <- file.path(assets_dir, "ladda")
+
+# we need to tell our application where to look for ladda
+laddaDependency <- function(){
+  htmltools::htmlDependency(
+    name    = "ladda",
+    version = "1.0.6",
+    src     = file.path(analyses_dir, ladda_dir),
+    script     = c("js/spin.min.js",
+                   "js/ladda.min.js"),
+    stylesheet = c("css/ladda.min.css"),
+  )
+}
+
+# first create a visual!
+laddaButton <- function(inputId,
+                        label){
+  
+  value <- restoreInput(id      = inputId,
+                        default = NULL)
+  
+  data_style    <- "contract"
+  data_color    <- "mint"
+  data_size     <- "m"
+  spinner_size  <- NULL
+  spinner_lines <- 12
+  spinner_color <- "#ffffff"
+  
+  tagButton     <- htmltools::tags$button(
+    id                   = inputId,
+    type                 = "button",
+    class                = "ladda-button",
+    class                = "btn btn-default action-button",
+    `data-val`           = value,
+    `data-style`         = data_style,
+    `data-color`         = data_color,
+    `data-size`          = data_size,
+    `data-spinner-color` = spinner_color,
+    `data-spinner-lines` = spinner_lines,
+    htmltools::tags$span(class = "ladda-label", label)
+  )
+  
+  htmltools::attachDependencies(
+    x      = tagButton,
+    value  = laddaDependency(),
+    append = TRUE
+  )
+}
+
+# function to get query to run in JS
+laddaQuery <- function(id, method, ...){
+  
+  method <- match.arg(arg     = method,
+                      choices = c("start", "stop", "toggle", "setProgress"))
+  
+  args   <- paste(..., sep = ", ")
+  
+  script <- paste0("Ladda.create(document.querySelector('\\#", id, "'))")
+  
+  paste0(script, ".", method, "(", args, ")")
+}
+
+# function to run query in JS
+laddaRun <- function(...){
+  shinyjs::runjs(laddaQuery(...))
+}
+
+# create Ladda based on ID that has all of the relevant methods
+Ladda    <- function(id){
+  
+  gen_ladda_method <- function(method){
+    function(...)
+      laddaRun(id     = id,
+               method = method,
+               ...)
+  }
+  
+  list(start       = gen_ladda_method("start"),
+       stop        = gen_ladda_method("stop"),
+       toggle      = gen_ladda_method("toggle"),
+       setProgress = gen_ladda_method("setProgress"))
+}

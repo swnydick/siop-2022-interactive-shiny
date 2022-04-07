@@ -206,8 +206,9 @@ server <- function(input, output) {
     toggle(id   = "Reporting",
            anim = TRUE) 
     toggleClass("button", "btn-danger") 
+    
     html("button",
-         reporting_button_text[((reporting_button_state() %% 2) == 0) + 1])
+         reporting_button_text[((reporting_button_state() %% 2) != 0) + 1])
   }) 
   
   # GENERATE PRODUCTIVITY STATEMENT # 
