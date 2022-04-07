@@ -242,7 +242,7 @@ server <- function(input, output) {
     req(plot_data())
     aggregate.data.frame(x   = plot_data()$actual_productivity, 
                          by  = list(plot_data()$day), 
-                         FUN = mean) |>
+                         FUN = mean) %>%
     setNames(c("day", "average actual productivity"))
   })
 }
