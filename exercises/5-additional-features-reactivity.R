@@ -127,7 +127,7 @@ server <- function(input, output) {
   click_point_data <- reactiveVal(NULL)
   
   # observeEvent - bases actions on whether a new click has occurred
-  # req - makes sure that a click actually exists
+  # req - makes sure that a click actually exists (need this because plot_click could be NA)
   # click_point_data - this reactive gets filled with the data from the clicked point
   observeEvent(input$plot_click, {
     req(input$plot_click)
