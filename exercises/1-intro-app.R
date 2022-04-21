@@ -30,12 +30,14 @@ intro_displayr()
 ######
 
 # PAGE # 
+# Sets up the webpage
 ui <- fluidPage(
   
   # TITLE # 
   titlePanel("App 1: Introduction to Shiny"),
   
-  # SIDEBAR # 
+  # SIDEBAR #
+  # Creates a sidebar areaa - typically used for input controls
   sidebarLayout(
     sidebarPanel(
       
@@ -57,14 +59,14 @@ ui <- fluidPage(
           href = "http://archive.ics.uci.edu/ml/datasets/Productivity+Prediction+of+Garment+Employees"),
         " dataset courtesy of the UCI Machine Learning Repository. 
               Please visit the link for source and data dictionary.")
-    ), # end sidebar panel
+    ), # End sidebar panel
     
     # MAIN # 
     mainPanel(
       "world"
-    ) # end main
-  ) # end sidebar
-) # end ui
+    ) # End main
+  ) # End sidebar
+) # End ui
 
 ##########
 # SERVER #

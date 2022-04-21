@@ -20,12 +20,6 @@ setwd(analyses_dir)
 # To clean things up - running what's needed for all apps
 source('0-global.R')
 
-# Note - need some new items - but these are sourced in global 
-# library(shinyjs)
-
-# text labels for action button for showing/hiding reporting
-# reporting_button_text <- c("Hide Reporting", "Show Reporting")
-
 # INTRO # 
 intro_displayr()
 
@@ -128,7 +122,7 @@ server <- function(input, output) {
   reporting_button_state <- reactive(input$button)
   
   # MAKE PLOT DATA # 
-  plot_data <- reactive(x = data_team_subset(data = data, 
+  plot_data  <- reactive(x = data_team_subset(data = data, 
                                              dept = dept_selected(), 
                                              team = team_selected()))
   
